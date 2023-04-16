@@ -19,10 +19,11 @@ namespace Web_API_With_AOP.Controllers
         public async Task<ActionResult<List<Users>>> GetAllUsers()
         {
             using var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
-            var users = await connection.QueryAsync<Users>("SELECT * FROM tbl_clubUsers");
+            IEnumerable<Users> users = await SelectAllHeroes(connection);
             return Ok(users);
 
         }
+
 
         [HttpGet("{Id}")]
         public async Task<ActionResult<List<Users>>> GetUser(int Id)
@@ -31,6 +32,19 @@ namespace Web_API_With_AOP.Controllers
             var user = await connection.QueryFirstAsync<Users>("SELECT * FROM tbl_clubUsers WHERE userID = @Id", new { Id = Id });
             return Ok(user);
 
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<List<Users>>> CreateUser(Users user)
+        {
+            using var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
+            await connection.ExecuteAsync("INSERT INTO tbl_clubUsers (Department, FirstName, LastName, Position, City) values (@userDepartment, @userFirstName, @userLastName, @userPosition, @userCity", user);
+            return Ok(await SelectAllHeroes(connection));
+        }
+
+        private static async Task<IEnumerable<Users>> SelectAllHeroes(SqlConnection connection)
+        {
+            return await connection.QueryAsync<Users>("SELECT * FROM tbl_clubUsers");
         }
     }
 }
