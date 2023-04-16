@@ -38,7 +38,7 @@ namespace Web_API_With_AOP.Controllers
         public async Task<ActionResult<List<Users>>> CreateUser(Users user)
         {
             using var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
-            await connection.ExecuteAsync("INSERT INTO tbl_clubUsers (Department, FirstName, LastName, Position, City) values (@userDepartment, @userFirstName, @userLastName, @userPosition, @userCity", user);
+            await connection.ExecuteAsync("INSERT INTO tbl_clubUsers (departmentID, userFirstName, userLastName, userPosition, userCity) values (@departmentID, @userFirstName, @userLastName, @userPosition, @userCity)", user);
             return Ok(await SelectAllHeroes(connection));
         }
 
