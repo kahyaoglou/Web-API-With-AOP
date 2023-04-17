@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
+using System.Xml.Linq;
 
 namespace Web_API_With_AOP.Controllers
 {
@@ -14,8 +15,8 @@ namespace Web_API_With_AOP.Controllers
         {
             _config = config;
         }
-
         [HttpGet]
+        [YetkiKontrol, YetkiKontrolParameters(Name = "GetAll")]
         public async Task<ActionResult<List<Users>>> GetAllUsers()
         {
             using var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
