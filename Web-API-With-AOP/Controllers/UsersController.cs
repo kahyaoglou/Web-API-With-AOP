@@ -42,6 +42,22 @@ namespace Web_API_With_AOP.Controllers
             return Ok(await SelectAllHeroes(connection));
         }
 
+        [HttpPut]
+        public async Task<ActionResult<List<Users>>> UpdateUser(Users user)
+        {
+            using var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
+            await connection.ExecuteAsync("UPDATE tbl_clubUsers SET departmentID = @departmentID, userFirstName = @userFirstName, userLastName = @userLastName, userPosition = @userPosition, userCity = @userCity WHERE userID = @userID", user);
+            return Ok(await SelectAllHeroes(connection));
+        }
+
+        [HttpDelete("{userID}")]
+        public async Task<ActionResult<List<Users>>> DeleteUser(int userID)
+        {
+            using var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
+            await connection.ExecuteAsync("DELETE FROM tbl_clubUsers WHERE userID = @userID", new { userID = userID });
+            return Ok(await SelectAllHeroes(connection));
+        }
+
         private static async Task<IEnumerable<Users>> SelectAllHeroes(SqlConnection connection)
         {
             return await connection.QueryAsync<Users>("SELECT * FROM tbl_clubUsers");
