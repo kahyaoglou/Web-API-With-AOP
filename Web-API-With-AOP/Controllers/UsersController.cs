@@ -11,16 +11,19 @@ namespace Web_API_With_AOP.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IConfiguration _config;
+
         public UsersController(IConfiguration config)
         {
             _config = config;
         }
+
+
         [HttpGet]
-        [YetkiKontrol, YetkiKontrolParameters(Name = "GetAll")]
-        public async Task<ActionResult<List<Users>>> GetAllUsers()
+        [YetkiKontrol, YetkiKontrolParameters(Name = YetkiKontrolType.GetAllUsers, DepartmentId = 1)]
+        public async Task<ActionResult<List<Users>>> GetAllUsers(/**/)
         {
             using var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
-            IEnumerable<Users> users = await SelectAllHeroes(connection);
+            IEnumerable<Users> users = await SelectAllUsers(connection);
             return Ok(users);
 
         }
@@ -40,7 +43,7 @@ namespace Web_API_With_AOP.Controllers
         {
             using var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
             await connection.ExecuteAsync("INSERT INTO tbl_clubUsers (departmentID, userFirstName, userLastName, userPosition, userCity) values (@departmentID, @userFirstName, @userLastName, @userPosition, @userCity)", user);
-            return Ok(await SelectAllHeroes(connection));
+            return Ok(await SelectAllUsers(connection));
         }
 
         [HttpPut]
@@ -48,7 +51,7 @@ namespace Web_API_With_AOP.Controllers
         {
             using var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
             await connection.ExecuteAsync("UPDATE tbl_clubUsers SET departmentID = @departmentID, userFirstName = @userFirstName, userLastName = @userLastName, userPosition = @userPosition, userCity = @userCity WHERE userID = @userID", user);
-            return Ok(await SelectAllHeroes(connection));
+            return Ok(await SelectAllUsers(connection));
         }
 
         [HttpDelete("{userID}")]
@@ -56,10 +59,10 @@ namespace Web_API_With_AOP.Controllers
         {
             using var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
             await connection.ExecuteAsync("DELETE FROM tbl_clubUsers WHERE userID = @userID", new { userID = userID });
-            return Ok(await SelectAllHeroes(connection));
+            return Ok(await SelectAllUsers(connection));
         }
 
-        private static async Task<IEnumerable<Users>> SelectAllHeroes(SqlConnection connection)
+        private static async Task<IEnumerable<Users>> SelectAllUsers(SqlConnection connection)
         {
             return await connection.QueryAsync<Users>("SELECT * FROM tbl_clubUsers");
         }

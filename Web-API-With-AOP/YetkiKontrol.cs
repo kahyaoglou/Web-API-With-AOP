@@ -1,6 +1,7 @@
 ﻿using AspectInjector.Broker;
 using Dapper;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Reflection;
 
 namespace Web_API_With_AOP
@@ -9,28 +10,43 @@ namespace Web_API_With_AOP
     [Injection(typeof(YetkiKontrol))]
     public class YetkiKontrol : Attribute
     {
+
         public YetkiKontrol()
         {
-            
+
         }
 
         [Advice(Kind.Before)]
         public void LogEnter([Argument(Source.Method)] MethodBase method)
         {
-            var yetkilist = new List<string>() { "GetAllUsers" };
+
             var options = method.GetCustomAttribute<YetkiKontrolParameters>();
-            var _name = options?.Name ?? string.Empty;
-            bool yetkisiyok = !yetkilist.Contains(_name);
+
+
+            using var connection = new SqlConnection("Server=FURKANKHP; Database=footballClub; Trusted_Connection=true;");
+            var yetkisiyok = connection.QueryFirstOrDefault<int>("SELECT permissionID FROM tbl_departmentPermission WHERE permissionID = @permissionID and departmentID = @departmentID", new { permissionID =(int)options.Name, departmentID = options.DepartmentId }) != null;
+
 
             if (yetkisiyok)
             {
-                throw new Exception("Furkan adlı kulllanıcının bu işleme yetkisi yoktur.");
+                throw new Exception("Bu kulllanıcının buradaki işleme yetkisi yoktur.");
             }
         }
     }
 
     public class YetkiKontrolParameters : Attribute
     {
-        public string Name { get; set; }
+        public YetkiKontrolType Name { get; set; }
+        public int DepartmentId { get; set; }
+
     }
+    public enum YetkiKontrolType
+    {
+        GetAllUsers = 1,
+        GetUser = 2,
+        CreateUser = 3,
+        UpdateUser = 4,
+        DeleteUser = 5
+    }
+
 }
