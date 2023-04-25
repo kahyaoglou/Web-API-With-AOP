@@ -21,15 +21,18 @@ namespace Web_API_With_AOP
         {
 
             var options = method.GetCustomAttribute<YetkiKontrolParameters>();
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
 
 
             using var connection = new SqlConnection("Server=FURKANKHP; Database=footballClub; Trusted_Connection=true;");
-            var yetkisiyok = connection.QueryFirstOrDefault<int>("SELECT permissionID FROM tbl_departmentPermission WHERE permissionID = @permissionID and departmentID = @departmentID", new { permissionID =(int)options.Name, departmentID = options.DepartmentId }) != null;
+            var yetkisiyok = connection.QueryFirstOrDefault<int?>("SELECT permissionID FROM tbl_departmentPermission WHERE permissionID = @permissionID and departmentID = @departmentID", new { permissionID = (int)options.Name, departmentID = options.DepartmentId });
 
-
-            if (yetkisiyok)
+            if (yetkisiyok == null)
             {
-                throw new Exception("Bu kulllanıcının buradaki işleme yetkisi yoktur.");
+                throw new Exception("Bu kullanıcının buradaki işleme yetkisi yoktur.");
             }
         }
     }

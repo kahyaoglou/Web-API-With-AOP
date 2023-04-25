@@ -19,7 +19,7 @@ namespace Web_API_With_AOP.Controllers
 
 
         [HttpGet]
-        [YetkiKontrol, YetkiKontrolParameters(Name = YetkiKontrolType.GetAllUsers, DepartmentId = 1)]
+        [YetkiKontrol, YetkiKontrolParameters(Name = YetkiKontrolType.GetAllUsers, DepartmentId = 3)]
         public async Task<ActionResult<List<Users>>> GetAllUsers(/**/)
         {
             using var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
@@ -30,7 +30,7 @@ namespace Web_API_With_AOP.Controllers
 
 
         [HttpGet("{Id}")]
-        public async Task<ActionResult<List<Users>>> GetUser(int Id)
+        public async Task<ActionResult<List<Users>>> GetUsers(int Id)
         {
             using var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
             var user = await connection.QueryFirstAsync<Users>("SELECT * FROM tbl_clubUsers WHERE userID = @Id", new { Id = Id });
